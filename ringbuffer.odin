@@ -13,6 +13,10 @@ RingBuffer :: struct($T: typeid) {
     looped: bool,
 }
 
+length :: proc(buffer: RingBuffer($T)) -> int
+{
+    return buffer.looped ? len(buffer.data) : buffer.idx
+}
 
 push_elem :: proc(buffer: ^RingBuffer($T), elem: T) 
 {
