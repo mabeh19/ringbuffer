@@ -25,11 +25,13 @@ push_elem :: proc(buffer: ^RingBuffer($T), elem: T)
             resize(&buffer.data, 2 * len(buffer.data))
         }
     }
-    else if buffer.idx == len(buffer.data) {
-        buffer.looped = true
-    }
     buffer.data[buffer.idx] = elem
-    buffer.idx = (buffer.idx + 1) % len(buffer.data)
+    buffer.idx += 1
+
+    if !buffer.dyn && buffer.idx == len(buffer.data) {
+        buffer.looped = true
+        buffer.idx %= len(buffer.data)
+    }
 }
 
 push_slice :: proc(buffer: ^RingBuffer($T), slice: []T) 
@@ -46,10 +48,13 @@ push_slice :: proc(buffer: ^RingBuffer($T), slice: []T)
 
     if second_slice > 0 {
         copy(buffer.data[:second_slice], slice[first_slice:])
-        buffer.looped = true
     }
 
-    buffer.idx = (buffer.idx + len(slice)) % len(buffer.data)
+    new_idx := (buffer.idx + len(slice)) % len(buffer.data)
+    if new_idx < buffer.idx {
+        buffer.looped = true
+    }
+    buffer.idx = new_idx
 }
 
 push :: proc{push_elem, push_slice}
