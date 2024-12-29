@@ -4,6 +4,7 @@ import "core:fmt"
 import "core:slice"
 import "core:testing"
 import "core:log"
+import "base:builtin"
 
 
 RingBuffer :: struct($T: typeid) {
@@ -94,7 +95,7 @@ new :: proc(n: int, $T: typeid, dyn: bool) -> RingBuffer(T)
 
 clear :: proc(buffer: ^RingBuffer($T))
 {
-    slice.fill(buffer.data[:], T{})
+    slice.fill(buffer.data[:], 0)
     buffer.idx = 0
     buffer.looped = false
 }
